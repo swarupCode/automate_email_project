@@ -14,3 +14,25 @@ def load_df(url):
     return df
 
 print(load_df(URL))
+
+def query_date_and_send_emails(df):
+    present = date.today()
+    email_counter = 0
+    for _, row in df.iterrows():
+        # if reminder date is today or already passed AND customer did not pay yet then, send reminder.
+        if (present >= row["reminder_date"].date() and row["has_paid"] == "no"):
+            send_email(
+                subject=f'[Swarup Codes Pvt Ltd.] Invoice: {row["invoice_no"]}',
+                name=row["name"],
+                receiver_email=row["email"],
+                due_date=row["due_date"].strftime("%d, %b %Y"), # example: 11, Aug 2024
+                invoice_no=row["invoice_no"],
+                amount=row["amount"]
+            )
+            email_counter += 1
+    return f"Total email sent: {email_counter}"
+
+df = load_df(URL)
+result = query_date_and_send_emails(df)
+print(result)
+
